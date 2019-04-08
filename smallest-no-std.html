@@ -1,0 +1,288 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>The smallest #![no_std] program - The Embedonomicon</title>
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body class="light">
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { } 
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            document.body.className = theme;
+            document.querySelector('html').className = theme + ' js';
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <ol class="chapter"><li class="affix"><a href="preface.html">Preface</a></li><li><a href="smallest-no-std.html" class="active"><strong aria-hidden="true">1.</strong> The smallest #![no_std] program</a></li><li><a href="memory-layout.html"><strong aria-hidden="true">2.</strong> Memory layout</a></li><li><a href="main.html"><strong aria-hidden="true">3.</strong> A main interface</a></li><li><a href="exceptions.html"><strong aria-hidden="true">4.</strong> Exception handling</a></li><li><a href="asm.html"><strong aria-hidden="true">5.</strong> Assembly on stable</a></li><li><a href="logging.html"><strong aria-hidden="true">6.</strong> Logging with symbols</a></li><li><a href="singleton.html"><strong aria-hidden="true">7.</strong> Global singletons</a></li><li><a href="dma.html"><strong aria-hidden="true">8.</strong> DMA</a></li><li><a href="concurrency.html"><strong aria-hidden="true">9.</strong> Concurrency</a></li><li class="spacer"></li><li class="affix"><a href="compiler-support.html">A note on compiler support</a></li></ol>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar" class="menu-bar">
+                    <div id="menu-bar-sticky-container">
+                        <div class="left-buttons">
+                            <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                                <i class="fa fa-bars"></i>
+                            </button>
+                            <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                                <i class="fa fa-paint-brush"></i>
+                            </button>
+                            <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                                <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                            </ul>
+                            
+                            <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                                <i class="fa fa-search"></i>
+                            </button>
+                            
+                        </div>
+
+                        <h1 class="menu-title">The Embedonomicon</h1> 
+
+                        <div class="right-buttons">
+                            <a href="print.html" title="Print this book" aria-label="Print this book">
+                                <i id="print-button" class="fa fa-print"></i>
+                            </a>
+                            
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <a class="header" href="#the-smallest-no_std-program" id="the-smallest-no_std-program"><h1>The smallest <code>#![no_std]</code> program</h1></a>
+<p>In this section we'll write the smallest <code>#![no_std]</code> program that <em>compiles</em>.</p>
+<a class="header" href="#what-does-no_std-mean" id="what-does-no_std-mean"><h2>What does <code>#![no_std]</code> mean?</h2></a>
+<p><code>#![no_std]</code> is a crate level attribute that indicates that the crate will link to the <a href="https://doc.rust-lang.org/core/"><code>core</code></a> crate
+instead of the <a href="https://doc.rust-lang.org/std/"><code>std</code></a> crate, but what does this mean for applications?</p>
+<p>The <code>std</code> crate is Rust's standard library. It contains functionality that assumes that the program
+will run on an operating system rather than <a href="https://en.wikipedia.org/wiki/Bare_machine"><em>directly on the metal</em></a>. <code>std</code> also assumes that the
+operating system is a general purpose operating system, like the ones one would find in servers and
+desktops. For this reason, <code>std</code> provides a standard API over functionality one usually finds in
+such operating systems: Threads, files, sockets, a filesystem, processes, etc.</p>
+<p>On the other hand, the <code>core</code> crate is a subset of the <code>std</code> crate that makes zero assumptions about
+the system the program will run on. As such, it provides APIs for language primitives like floats,
+strings and slices, as well as APIs that expose processor features like atomic operations and SIMD
+instructions. However it lacks APIs for anything that involves heap memory allocations and I/O.</p>
+<p>For an application, <code>std</code> does more than just providing a way to access OS abstractions. <code>std</code> also
+takes care of, among other things, setting up stack overflow protection, processing command line
+arguments and spawning the main thread before a program's <code>main</code> function is invoked. A <code>#![no_std]</code>
+application lacks all that standard runtime, so it must initialize its own runtime, if any is
+required.</p>
+<p>Because of these properties, a <code>#![no_std]</code> application can be the first and / or the only code that
+runs on a system. It can be many things that a standard Rust application can never be, for example:</p>
+<ul>
+<li>The kernel of an OS.</li>
+<li>Firmware.</li>
+<li>A bootloader.</li>
+</ul>
+<a class="header" href="#the-code" id="the-code"><h2>The code</h2></a>
+<p>With that out of the way, we can move on to the smallest <code>#![no_std]</code> program that compiles:</p>
+<pre><code class="language-console">$ cargo new --edition 2018 --bin app
+
+$ cd app
+</code></pre>
+<pre><code class="language-console">$ # modify main.rs so it has these contents
+$ cat src/main.rs
+</code></pre>
+<pre><pre class="playpen"><code class="language-rust">
+# #![allow(unused_variables)]
+#![no_main]
+#![no_std]
+
+#fn main() {
+use core::panic::PanicInfo;
+
+#[panic_handler]
+fn panic(_panic: &amp;PanicInfo&lt;'_&gt;) -&gt; ! {
+    loop {}
+}
+
+#}</code></pre></pre>
+<p>This program contains some things that you won't see in standard Rust programs:</p>
+<p>The <code>#![no_std]</code> attribute which we have already extensively covered.</p>
+<p>The <code>#![no_main]</code> attribute which means that the program won't use the standard <code>main</code> function as
+its entry point. At the time of writing, Rust's <code>main</code> interface makes some assumptions about the
+environment the program executes in: For example, it assumes the existence of command line
+arguments, so in general, it's not appropriate for <code>#![no_std]</code> programs.</p>
+<p>The <code>#[panic_handler]</code> attribute. The function marked with this attribute defines the behavior
+of panics, both library level panics (<code>core::panic!</code>) and language level panics (out of bounds
+indexing).</p>
+<p>This program doesn't produce anything useful. In fact, it will produce an empty binary.</p>
+<pre><code class="language-console">$ # equivalent to `size target/thumbv7m-none-eabi/debug/app`
+$ cargo size --target thumbv7m-none-eabi --bin app
+</code></pre>
+<pre><code class="language-text">   text	   data	    bss	    dec	    hex	filename
+      0	      0	      0	      0	      0	app
+
+</code></pre>
+<p>Before linking the crate does contain the panicking symbol.</p>
+<pre><code class="language-console">$ cargo rustc --target thumbv7m-none-eabi -- --emit=obj
+
+$ cargo nm -- target/thumbv7m-none-eabi/debug/deps/app-*.o | grep '[0-9]* [^n] '
+</code></pre>
+<pre><code class="language-text">00000000 T rust_begin_unwind
+
+</code></pre>
+<p>However, it's our starting point. In the next section, we'll build something useful. But before
+continuing, let's set a default build target to avoid having to pass the <code>--target</code> flag to every
+Cargo invocation.</p>
+<pre><code class="language-console">$ mkdir .cargo
+
+$ # modify .cargo/config so it has these contents
+$ cat .cargo/config
+</code></pre>
+<pre><code class="language-toml">[build]
+target = &quot;thumbv7m-none-eabi&quot;
+</code></pre>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="preface.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="memory-layout.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a href="preface.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a href="memory-layout.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+
+        
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>

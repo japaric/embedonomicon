@@ -1,0 +1,403 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>A note on compiler support - The Embedonomicon</title>
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body class="light">
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { } 
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            document.body.className = theme;
+            document.querySelector('html').className = theme + ' js';
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <ol class="chapter"><li class="affix"><a href="preface.html">Preface</a></li><li><a href="smallest-no-std.html"><strong aria-hidden="true">1.</strong> The smallest #![no_std] program</a></li><li><a href="memory-layout.html"><strong aria-hidden="true">2.</strong> Memory layout</a></li><li><a href="main.html"><strong aria-hidden="true">3.</strong> A main interface</a></li><li><a href="exceptions.html"><strong aria-hidden="true">4.</strong> Exception handling</a></li><li><a href="asm.html"><strong aria-hidden="true">5.</strong> Assembly on stable</a></li><li><a href="logging.html"><strong aria-hidden="true">6.</strong> Logging with symbols</a></li><li><a href="singleton.html"><strong aria-hidden="true">7.</strong> Global singletons</a></li><li><a href="dma.html"><strong aria-hidden="true">8.</strong> DMA</a></li><li><a href="concurrency.html"><strong aria-hidden="true">9.</strong> Concurrency</a></li><li class="spacer"></li><li class="affix"><a href="compiler-support.html" class="active">A note on compiler support</a></li></ol>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar" class="menu-bar">
+                    <div id="menu-bar-sticky-container">
+                        <div class="left-buttons">
+                            <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                                <i class="fa fa-bars"></i>
+                            </button>
+                            <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                                <i class="fa fa-paint-brush"></i>
+                            </button>
+                            <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                                <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                            </ul>
+                            
+                            <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                                <i class="fa fa-search"></i>
+                            </button>
+                            
+                        </div>
+
+                        <h1 class="menu-title">The Embedonomicon</h1> 
+
+                        <div class="right-buttons">
+                            <a href="print.html" title="Print this book" aria-label="Print this book">
+                                <i id="print-button" class="fa fa-print"></i>
+                            </a>
+                            
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <a class="header" href="#a-note-on-compiler-support" id="a-note-on-compiler-support"><h1>A note on compiler support</h1></a>
+<p>This book makes use of a built-in <em>compiler</em> target, the <code>thumbv7m-none-eabi</code>, for which the Rust
+team distributes a <code>rust-std</code> component, which is a pre-compiled collection of crates like <a href="https://doc.rust-lang.org/core/index.html"><code>core</code></a> and <a href="https://doc.rust-lang.org/std/index.html"><code>std</code></a>.</p>
+<p>If you want to attempt replicating the contents of this book for a different target architecture, you
+need to take into account the different levels of support that Rust provides for (compilation)
+targets.</p>
+<a class="header" href="#llvm-support" id="llvm-support"><h2>LLVM support</h2></a>
+<p>As of Rust 1.28, the official Rust compiler, <code>rustc</code>, uses LLVM for (machine) code generation. The
+minimal level of support Rust provides for an architecture is having its LLVM backend enabled in
+<code>rustc</code>. You can see all the architectures that <code>rustc</code> supports, through LLVM, by running the
+following command:</p>
+<pre><code class="language-console">$ # you need to have `cargo-binutils` installed to run this command
+$ cargo objdump -- -version
+LLVM (http://llvm.org/):
+  LLVM version 7.0.0svn
+  Optimized build.
+  Default target: x86_64-unknown-linux-gnu
+  Host CPU: skylake
+
+  Registered Targets:
+    aarch64    - AArch64 (little endian)
+    aarch64_be - AArch64 (big endian)
+    arm        - ARM
+    arm64      - ARM64 (little endian)
+    armeb      - ARM (big endian)
+    hexagon    - Hexagon
+    mips       - Mips
+    mips64     - Mips64 [experimental]
+    mips64el   - Mips64el [experimental]
+    mipsel     - Mipsel
+    msp430     - MSP430 [experimental]
+    nvptx      - NVIDIA PTX 32-bit
+    nvptx64    - NVIDIA PTX 64-bit
+    ppc32      - PowerPC 32
+    ppc64      - PowerPC 64
+    ppc64le    - PowerPC 64 LE
+    sparc      - Sparc
+    sparcel    - Sparc LE
+    sparcv9    - Sparc V9
+    systemz    - SystemZ
+    thumb      - Thumb
+    thumbeb    - Thumb (big endian)
+    wasm32     - WebAssembly 32-bit
+    wasm64     - WebAssembly 64-bit
+    x86        - 32-bit X86: Pentium-Pro and above
+    x86-64     - 64-bit X86: EM64T and AMD64
+</code></pre>
+<p>If LLVM supports the architecture you are interested in, but <code>rustc</code> is built with the backend
+disabled (which is the case of AVR as of Rust 1.28), then you will need to modify the Rust source
+enabling it. The first two commits of PR <a href="https://github.com/rust-lang/rust/pull/52787">rust-lang/rust#52787</a> give you an idea of the required
+changes.</p>
+<p>On the other hand, if LLVM doesn't support the architecture, but a fork of LLVM does, you will have
+to replace the original version of LLVM with the fork before building <code>rustc</code>. The Rust build system
+allows this and in principle it should just require changing the <code>llvm</code> submodule to point to the fork.</p>
+<p>If your target architecture is only supported by some vendor provided GCC, you have the option of
+using <a href="https://github.com/thepowersgang/mrustc"><code>mrustc</code></a>, an unofficial Rust compiler, to translate your Rust program into C code and then
+compile that using GCC.</p>
+<a class="header" href="#built-in-target" id="built-in-target"><h2>Built-in target</h2></a>
+<p>A compilation target is more than just its architecture. Each target has a <a href="https://github.com/rust-lang/rfcs/blob/master/text/0131-target-specification.md">specification</a>
+associated to it that describes, among other things, its architecture, its operating system
+and the default linker.</p>
+<p>The Rust compiler knows about several targets. These are said to be <em>built into</em> the compiler and
+can be listed by running the following command:</p>
+<pre><code class="language-console">$ rustc --print target-list | column
+aarch64-fuchsia                 mips64el-unknown-linux-gnuabi64
+aarch64-linux-android           mipsel-unknown-linux-gnu
+aarch64-unknown-cloudabi        mipsel-unknown-linux-musl
+aarch64-unknown-freebsd         mipsel-unknown-linux-uclibc
+aarch64-unknown-linux-gnu       msp430-none-elf
+aarch64-unknown-linux-musl      powerpc-unknown-linux-gnu
+aarch64-unknown-openbsd         powerpc-unknown-linux-gnuspe
+arm-linux-androideabi           powerpc-unknown-netbsd
+arm-unknown-linux-gnueabi       powerpc64-unknown-linux-gnu
+arm-unknown-linux-gnueabihf     powerpc64le-unknown-linux-gnu
+arm-unknown-linux-musleabi      powerpc64le-unknown-linux-musl
+arm-unknown-linux-musleabihf    s390x-unknown-linux-gnu
+armebv7r-none-eabihf            sparc-unknown-linux-gnu
+armv4t-unknown-linux-gnueabi    sparc64-unknown-linux-gnu
+armv5te-unknown-linux-gnueabi   sparc64-unknown-netbsd
+armv5te-unknown-linux-musleabi  sparcv9-sun-solaris
+armv6-unknown-netbsd-eabihf     thumbv6m-none-eabi
+armv7-linux-androideabi         thumbv7em-none-eabi
+armv7-unknown-cloudabi-eabihf   thumbv7em-none-eabihf
+armv7-unknown-linux-gnueabihf   thumbv7m-none-eabi
+armv7-unknown-linux-musleabihf  wasm32-experimental-emscripten
+armv7-unknown-netbsd-eabihf     wasm32-unknown-emscripten
+asmjs-unknown-emscripten        wasm32-unknown-unknown
+i586-pc-windows-msvc            x86_64-apple-darwin
+i586-unknown-linux-gnu          x86_64-fuchsia
+i586-unknown-linux-musl         x86_64-linux-android
+i686-apple-darwin               x86_64-pc-windows-gnu
+i686-linux-android              x86_64-pc-windows-msvc
+i686-pc-windows-gnu             x86_64-rumprun-netbsd
+i686-pc-windows-msvc            x86_64-sun-solaris
+i686-unknown-cloudabi           x86_64-unknown-bitrig
+i686-unknown-dragonfly          x86_64-unknown-cloudabi
+i686-unknown-freebsd            x86_64-unknown-dragonfly
+i686-unknown-haiku              x86_64-unknown-freebsd
+i686-unknown-linux-gnu          x86_64-unknown-haiku
+i686-unknown-linux-musl         x86_64-unknown-l4re-uclibc
+i686-unknown-netbsd             x86_64-unknown-linux-gnu
+i686-unknown-openbsd            x86_64-unknown-linux-gnux32
+mips-unknown-linux-gnu          x86_64-unknown-linux-musl
+mips-unknown-linux-musl         x86_64-unknown-netbsd
+mips-unknown-linux-uclibc       x86_64-unknown-openbsd
+mips64-unknown-linux-gnuabi64   x86_64-unknown-redox
+</code></pre>
+<p>You can print the specification of any of these targets using the following command:</p>
+<pre><code class="language-console">$ rustc +nightly -Z unstable-options --print target-spec-json --target thumbv7m-none-eabi
+{
+  &quot;abi-blacklist&quot;: [
+    &quot;stdcall&quot;,
+    &quot;fastcall&quot;,
+    &quot;vectorcall&quot;,
+    &quot;thiscall&quot;,
+    &quot;win64&quot;,
+    &quot;sysv64&quot;
+  ],
+  &quot;arch&quot;: &quot;arm&quot;,
+  &quot;data-layout&quot;: &quot;e-m:e-p:32:32-i64:64-v128:64:128-a:0:32-n32-S64&quot;,
+  &quot;emit-debug-gdb-scripts&quot;: false,
+  &quot;env&quot;: &quot;&quot;,
+  &quot;executables&quot;: true,
+  &quot;is-builtin&quot;: true,
+  &quot;linker&quot;: &quot;arm-none-eabi-gcc&quot;,
+  &quot;linker-flavor&quot;: &quot;gcc&quot;,
+  &quot;llvm-target&quot;: &quot;thumbv7m-none-eabi&quot;,
+  &quot;max-atomic-width&quot;: 32,
+  &quot;os&quot;: &quot;none&quot;,
+  &quot;panic-strategy&quot;: &quot;abort&quot;,
+  &quot;relocation-model&quot;: &quot;static&quot;,
+  &quot;target-c-int-width&quot;: &quot;32&quot;,
+  &quot;target-endian&quot;: &quot;little&quot;,
+  &quot;target-pointer-width&quot;: &quot;32&quot;,
+  &quot;vendor&quot;: &quot;&quot;
+}
+</code></pre>
+<p>If none of these built-in targets seems appropriate for your target system, you'll have to create a
+custom target by writing your own target specification file in JSON format. The recommended way is to
+dump the specification of a built-in target that's similar to your target system into a file and then
+tweak it to match the properties of your target system. To do so, use the previously shown command,
+<code>rustc --print target-spec-json</code>. As of Rust 1.28, there's no up to date documentation on what each of
+the fields of a target specification mean, other than <a href="https://github.com/rust-lang/rust/blob/1.27.2/src/librustc_target/spec/mod.rs#L376-L400">the compiler source code</a>.</p>
+<p>Once you have a target specification file you can refer to it by its path or by its name if its in
+the current directory or in <code>$RUST_TARGET_PATH</code>.</p>
+<pre><code class="language-console">$ rustc +nightly -Z unstable-options --print target-spec-json \
+      --target thumbv7m-none-eabi \
+      &gt; foo.json
+
+$ rustc --print cfg --target foo.json # or just --target foo
+debug_assertions
+target_arch=&quot;arm&quot;
+target_endian=&quot;little&quot;
+target_env=&quot;&quot;
+target_feature=&quot;mclass&quot;
+target_feature=&quot;v7&quot;
+target_has_atomic=&quot;16&quot;
+target_has_atomic=&quot;32&quot;
+target_has_atomic=&quot;8&quot;
+target_has_atomic=&quot;cas&quot;
+target_has_atomic=&quot;ptr&quot;
+target_os=&quot;none&quot;
+target_pointer_width=&quot;32&quot;
+target_vendor=&quot;&quot;
+</code></pre>
+<a class="header" href="#rust-std-component" id="rust-std-component"><h2><code>rust-std</code> component</h2></a>
+<p>For some of the built-in target the Rust team distributes <code>rust-std</code> components via <code>rustup</code>. This
+component is a collection of pre-compiled crates like <code>core</code> and <code>std</code>, and it's required for
+cross compilation.</p>
+<p>You can find the list of targets that have a <code>rust-std</code> component available via <code>rustup</code> by running
+the following command:</p>
+<pre><code class="language-console">$ rustup target list | column
+aarch64-apple-ios                       mips64-unknown-linux-gnuabi64
+aarch64-linux-android                   mips64el-unknown-linux-gnuabi64
+aarch64-unknown-fuchsia                 mipsel-unknown-linux-gnu
+aarch64-unknown-linux-gnu               mipsel-unknown-linux-musl
+aarch64-unknown-linux-musl              powerpc-unknown-linux-gnu
+arm-linux-androideabi                   powerpc64-unknown-linux-gnu
+arm-unknown-linux-gnueabi               powerpc64le-unknown-linux-gnu
+arm-unknown-linux-gnueabihf             s390x-unknown-linux-gnu
+arm-unknown-linux-musleabi              sparc64-unknown-linux-gnu
+arm-unknown-linux-musleabihf            sparcv9-sun-solaris
+armv5te-unknown-linux-gnueabi           thumbv6m-none-eabi
+armv5te-unknown-linux-musleabi          thumbv7em-none-eabi
+armv7-apple-ios                         thumbv7em-none-eabihf
+armv7-linux-androideabi                 thumbv7m-none-eabi
+armv7-unknown-linux-gnueabihf           wasm32-unknown-emscripten
+armv7-unknown-linux-musleabihf          wasm32-unknown-unknown
+armv7s-apple-ios                        x86_64-apple-darwin
+asmjs-unknown-emscripten                x86_64-apple-ios
+i386-apple-ios                          x86_64-linux-android
+i586-pc-windows-msvc                    x86_64-pc-windows-gnu
+i586-unknown-linux-gnu                  x86_64-pc-windows-msvc
+i586-unknown-linux-musl                 x86_64-rumprun-netbsd
+i686-apple-darwin                       x86_64-sun-solaris
+i686-linux-android                      x86_64-unknown-cloudabi
+i686-pc-windows-gnu                     x86_64-unknown-freebsd
+i686-pc-windows-msvc                    x86_64-unknown-fuchsia
+i686-unknown-freebsd                    x86_64-unknown-linux-gnu (default)
+i686-unknown-linux-gnu                  x86_64-unknown-linux-gnux32
+i686-unknown-linux-musl                 x86_64-unknown-linux-musl
+mips-unknown-linux-gnu                  x86_64-unknown-netbsd
+mips-unknown-linux-musl                 x86_64-unknown-redox
+</code></pre>
+<p>If there's no <code>rust-std</code> component for your target or you are using a custom target, then you'll have
+to use a tool like <a href="https://github.com/japaric/xargo">Xargo</a> to have Cargo compile the <code>core</code> crate on the fly. Note that Xargo
+requires a nightly toolchain; the long term plan is to upstream Xargo's functionality into Cargo
+and eventually have that functionality available on stable.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="concurrency.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a href="concurrency.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+
+        
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>

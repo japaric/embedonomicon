@@ -1,0 +1,1300 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Concurrency - The Embedonomicon</title>
+        <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link href="https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800" rel="stylesheet" type="text/css">
+        <link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:500" rel="stylesheet" type="text/css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        
+
+        
+    </head>
+    <body class="light">
+        <!-- Provide site root to javascript -->
+        <script type="text/javascript">
+            var path_to_root = "";
+            var default_theme = "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script type="text/javascript">
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script type="text/javascript">
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { } 
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            document.body.className = theme;
+            document.querySelector('html').className = theme + ' js';
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script type="text/javascript">
+            var html = document.querySelector('html');
+            var sidebar = 'hidden';
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <ol class="chapter"><li class="affix"><a href="preface.html">Preface</a></li><li><a href="smallest-no-std.html"><strong aria-hidden="true">1.</strong> The smallest #![no_std] program</a></li><li><a href="memory-layout.html"><strong aria-hidden="true">2.</strong> Memory layout</a></li><li><a href="main.html"><strong aria-hidden="true">3.</strong> A main interface</a></li><li><a href="exceptions.html"><strong aria-hidden="true">4.</strong> Exception handling</a></li><li><a href="asm.html"><strong aria-hidden="true">5.</strong> Assembly on stable</a></li><li><a href="logging.html"><strong aria-hidden="true">6.</strong> Logging with symbols</a></li><li><a href="singleton.html"><strong aria-hidden="true">7.</strong> Global singletons</a></li><li><a href="dma.html"><strong aria-hidden="true">8.</strong> DMA</a></li><li><a href="concurrency.html" class="active"><strong aria-hidden="true">9.</strong> Concurrency</a></li><li class="spacer"></li><li class="affix"><a href="compiler-support.html">A note on compiler support</a></li></ol>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                
+                <div id="menu-bar" class="menu-bar">
+                    <div id="menu-bar-sticky-container">
+                        <div class="left-buttons">
+                            <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                                <i class="fa fa-bars"></i>
+                            </button>
+                            <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                                <i class="fa fa-paint-brush"></i>
+                            </button>
+                            <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                                <li role="none"><button role="menuitem" class="theme" id="light">Light (default)</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                                <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                            </ul>
+                            
+                            <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                                <i class="fa fa-search"></i>
+                            </button>
+                            
+                        </div>
+
+                        <h1 class="menu-title">The Embedonomicon</h1> 
+
+                        <div class="right-buttons">
+                            <a href="print.html" title="Print this book" aria-label="Print this book">
+                                <i id="print-button" class="fa fa-print"></i>
+                            </a>
+                            
+                        </div>
+                    </div>
+                </div>
+
+                
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" name="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+                
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script type="text/javascript">
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <a class="header" href="#concurrency" id="concurrency"><h1>Concurrency</h1></a>
+<p>This section discusses <code>no_std</code> concurrency as usually found on
+microcontrollers, and memory safe patterns for sharing memory with / between
+interrupt handlers. The focus of this text is on uses of <code>unsafe</code> code that are
+memory safety rather than building safe abstractions.</p>
+<blockquote>
+<p><strong>NOTE:</strong> Unlike other chapters, this text has been written assuming that the
+reader is <em>not</em> familiar with the interrupt mechanism commonly found in
+microcontrollers. The motivation is making this text accessible to more people
+who then can audit our <code>unsafe</code> code.</p>
+</blockquote>
+<a class="header" href="#interrupts" id="interrupts"><h1>Interrupts</h1></a>
+<p>In bare metal systems, systems without an OS (operating system), usually the
+only form of concurrency available are <em>hardware</em> interrupts. An interrupt
+is a preemption mechanism that works as follows: when an <em>interrupt signal</em>
+arrives the processor suspends the execution of the current subroutine, (maybe)
+saves some registers (the current state of the program) to the stack and then
+jumps to another subroutine called the <em>interrupt handler</em>. When the processor
+returns from the interrupt handler, it restores the registers that it previously
+saved on the stack (if any) and then resumes the subroutine that was
+interrupted. (If you are familiar with POSIX signal handling, the semantics are
+pretty much the same)</p>
+<p>Interrupt signals usually come from peripherals and are fired <em>asynchronously</em>.
+Some examples of interrupt signals are: a counter reaching zero, an input pin
+changing its electrical / logical state, and the arrival of a new byte of data.
+In some multi-core devices a core can send an interrupt signal to a different
+core.</p>
+<p>How the processor locates the right interrupt handler to execute depends on the
+architecture. In the ARM Cortex-M architecture, there's one handler per
+interrupt signal and there's a table somewhere in memory that holds function
+pointers to all interrupt handlers. Each interrupt is given an index in this
+table. For example, a timer interrupt could be interrupt #0 and an input pin
+interrupt could be interrupt #1. If we were to depict this as Rust code it would
+look as follows:</p>
+<pre><pre class="playpen"><code class="language-rust">
+# #![allow(unused_variables)]
+#fn main() {
+// `link_section` places this in some known memory location
+#[link_section = &quot;.interrupt_table&quot;]
+static INTERRUPT_TABLE: [extern &quot;C&quot; fn(); 32] = [
+    // entry 0: timer 0
+    on_timer0_interrupt,
+
+    // entry 1: pin 0
+    on_pin0_interrupt,
+
+    // .. 30 more entries ..
+];
+
+// provided by the application author
+extern &quot;C&quot; fn on_timer0_interrupt() {
+    // ..
+}
+
+extern &quot;C&quot; fn on_pin0_interrupt() {
+    // ..
+}
+#}</code></pre></pre>
+<p>In another common interrupt model all interrupts signals map to the <em>same</em>
+interrupt handler (subroutine) and there's a hardware register that the software
+has to read when it enters the handler to figure out which interrupt signal
+triggered the interrupt. In this text, we'll focus on the ARM Cortex-M
+architecture which follows the one handler per interrupt signal model.</p>
+<a class="header" href="#interrupt-handling-api" id="interrupt-handling-api"><h2>Interrupt handling API</h2></a>
+<p>The most basic interrupt handling API lets the programmer <em>statically</em> register
+a function for each interrupt handler <em>only once</em>. On top of this basic API
+it's possible to implement APIs to <em>dynamically</em> register closures as interrupt
+handlers. In this text we'll focus on the former, simpler API.</p>
+<p>To illustrate this kind of API let's look at the <a href="https://crates.io/crates/cortex-m-rt/0.6.7"><code>cortex-m-rt</code></a> crate (v0.6.7).
+It provides two attributes to statically register interrupts: <code>#[exception]</code> and
+<code>#[interrupt]</code>. The former is for device agnostic interrupts, whose number and
+names are the same for all Cortex-M devices; the latter is for device specific
+interrupts, whose number and names vary per device / vendor. We'll stick to the
+device agnostic interrupts (&quot;exceptions&quot;) in our examples.</p>
+<p>The following example showcases the system timer (<code>SysTick</code>) interrupt, which
+fires periodically. The interrupt is handled using the <code>SysTick</code> handler
+(function), which prints a dot to the console.</p>
+<blockquote>
+<p><strong>NOTE:</strong> The code for the following example and all other examples can be
+found in the <code>ci/concurrency</code> directory at the root of <a href="https://github.com/rust-embedded/embedonomicon">this repository</a>.</p>
+</blockquote>
+<pre><pre class="playpen"><code class="language-rust">// source: examples/systick.rs
+
+#![no_main]
+#![no_std]
+
+extern crate panic_halt;
+
+use cortex_m::{asm, peripheral::syst::SystClkSource, Peripherals};
+use cortex_m_rt::{entry, exception};
+use cortex_m_semihosting::hprint;
+
+// program entry point
+#[entry]
+fn main() -&gt; ! {
+    let mut syst = Peripherals::take().unwrap().SYST;
+
+    // configures the system timer to trigger a SysTick interrupt every second
+    syst.set_clock_source(SystClkSource::Core);
+    syst.set_reload(12_000_000); // period = 1s
+    syst.enable_counter();
+    syst.enable_interrupt();
+
+    loop {
+        asm::nop();
+    }
+}
+
+// interrupt handler
+// NOTE: the function name must match the name of the interrupt
+#[exception]
+fn SysTick() {
+    hprint!(&quot;.&quot;).unwrap();
+}
+</code></pre></pre>
+<p>If you are not familiar with embedded / Cortex-M programs the most important
+thing to point note here is that the function marked with the <code>entry</code> attribute
+is the entry point of the user program. When the device (re)boots (e.g. it's
+first powered) the &quot;runtime&quot; (the <code>cortex-m-rt</code> crate) initializes <code>static</code>
+variables (the content of RAM is random on power on) and then calls the user
+program entry point. As the user program is the only process running it is not
+allowed to end / exit; this is enforced in the signature of the <code>entry</code>
+function: <code>fn() -&gt; !</code> -- a divergent function can't return.</p>
+<p>You can run this example on an x86 machine using QEMU. Make sure you have
+<code>qemu-system-arm</code> installed and run the following command</p>
+<pre><code class="language-console">$ cargo run --example systick
+(..)
+     Running `qemu-system-arm -cpu cortex-m3 -machine lm3s6965evb -nographic -semihosting-config enable=on,target=native -kernel target/thumbv7m-none-eabi/debug/examples/systick`
+.................
+</code></pre>
+<a class="header" href="#static-variables-what-is-safe-and-whats-not" id="static-variables-what-is-safe-and-whats-not"><h2><code>static</code> variables: what is safe and what's not</h2></a>
+<p>As interrupt handlers have their own (call) stack they can't refer to (access)
+local variables in <code>main</code> or in functions called by <code>main</code>. The only way <code>main</code>
+and an interrupt handler can share state is through <code>static</code> variables, which
+have statically known addresses.</p>
+<p>To really drive this point I find it useful to visualize the call stack of the
+program in the presence of interrupts. Consider the following example:</p>
+<pre><pre class="playpen"><code class="language-rust">#[entry]
+fn main() -&gt; ! {
+
+    loop {
+        {
+            let x = 42;
+            foo();
+        }
+
+        {
+            let w = 66;
+            bar();
+        }
+    }
+}
+
+fn foo() {
+   let y = 24;
+
+   // ..
+}
+
+fn bar() {
+    let z = 33;
+
+    // ..
+
+    foo();
+
+    // ..
+}
+
+#[exception]
+fn SysTick() {
+    // can't access `x` or `y` because their addresses are not statically known
+}
+</code></pre></pre>
+<p>If we take snapshots of the call stack every time the <code>SysTick</code> interrupt
+handler is called we'll observe something like this:</p>
+<pre><code class="language-text">                                                          +---------+
+                                                          | SysTick |
+                                                          |         |
+            +---------+            +---------+            +#########+
+            | SysTick |            | SysTick |            |   foo   |
+            |         |            |         |            | y = 24  |
+            +#########+            +#########+            +---------+
+            |   foo   |            |   bar   |            |   bar   |
+            | y = 24  |            | z = 33  |            | z = 33  |
+            +---------+            +---------+            +---------+
+            |   main  |            |   main  |            |   main  |
+            | x = 42  |            | w = 66  |            | w = 66  |
+            +---------+            +---------+            +---------+
+              t = 1ms                t = 2ms                t = 3ms
+</code></pre>
+<p>From the call stack <code>SysTick</code> looks like a normal function since it's contiguous
+in memory to <code>main</code> and the functions called from it. However, that's not the
+case: <code>SysTick</code> is invoked asynchronously. At time <code>t = 1ms</code> <code>SysTick</code> could, in
+theory, access <code>y</code> since it's in the previous stack frame; however, at time <code>t = 2ms</code> <code>y</code> doesn't exist; and at time <code>t = 3ms</code> <code>y</code> exists but has a different
+location in memory (address).</p>
+<p>I hope that explains why <code>SysTick</code> can't safely access the stack frames that
+belong to <code>main</code>.</p>
+<p>Let's now go over all the <code>unsafe</code> and safe ways in which <code>main</code> and interrupt
+handlers can share state (memory). We'll start assuming the program will run on
+a single core device, then we'll revisit our safe patterns in the context of a
+multi-core device.</p>
+<a class="header" href="#static-mut" id="static-mut"><h3><code>static mut</code></h3></a>
+<p>Unsynchronized access to <code>static mut</code> variables is undefined behavior (UB). The
+compiler <em>will</em> mis-optimize all those accesses.</p>
+<p>Consider the following <em>unsound</em> program:</p>
+<pre><pre class="playpen"><code class="language-rust">//! THIS PROGRAM IS UNSOUND!
+// source: examples/static-mut.rs
+
+#![no_main]
+#![no_std]
+
+extern crate panic_halt;
+
+use cortex_m::asm;
+use cortex_m_rt::{entry, exception};
+
+static mut X: u32 = 0;
+
+#[inline(never)]
+#[entry]
+fn main() -&gt; ! {
+    // omitted: configuring and enabling the `SysTick` interrupt
+
+    let x: &amp;mut u32 = unsafe { &amp;mut X };
+
+    loop {
+        *x = 0;
+
+        // &lt;~ preemption could occur here and change the value behind `x`
+
+        if *x != 0 {
+            // the compiler may optimize away this branch
+            panic!();
+        } else {
+            asm::nop();
+        }
+    }
+}
+
+#[exception]
+fn SysTick() {
+    unsafe {
+        X = 1;
+
+        asm::nop();
+    }
+}
+</code></pre></pre>
+<p>This program compiles: both <code>main</code> and <code>SysTick</code> can refer to the static
+variable <code>X</code>, which has a known, fixed location in memory. However, the program
+is mis-optimized to the following machine code:</p>
+<pre><code class="language-armasm">00000400 &lt;main&gt;:
+ 400:   bf00            nop
+ 402:   e7fd            b.n     400 &lt;main&gt;
+
+00000404 &lt;SysTick&gt;:
+ 404:   bf00            nop
+ 406:   4770            bx      lr
+</code></pre>
+<p>As you can see all accesses to <code>X</code> were optimized away changing the intended
+semantics.</p>
+<a class="header" href="#volatile" id="volatile"><h3>Volatile</h3></a>
+<p>Using volatile operations to access <code>static mut</code> variables does <em>not</em> prevent
+UB. Volatile operations will prevent the compiler from mis-optimizing accesses
+to the variables but they don't help with torn reads and writes which lead to
+UB.</p>
+<pre><pre class="playpen"><code class="language-rust">//! THIS PROGRAM IS UNSOUND!
+// source: examples/volatile.rs
+
+#![no_main]
+#![no_std]
+
+extern crate panic_halt;
+
+use core::ptr;
+
+use cortex_m::asm;
+use cortex_m_rt::{entry, exception};
+
+#[repr(u64)]
+enum Enum {
+    A = 0x0000_0000_ffff_ffff,
+    B = 0xffff_ffff_0000_0000,
+}
+
+static mut X: Enum = Enum::A;
+
+#[entry]
+fn main() -&gt; ! {
+    // omitted: configuring and enabling the `SysTick` interrupt
+
+    loop {
+        // this write operation is not atomic: it's performed in two moves
+        unsafe { ptr::write_volatile(&amp;mut X, Enum::A) } // &lt;~ preemption
+
+        unsafe { ptr::write_volatile(&amp;mut X, Enum::B) }
+    }
+}
+
+#[exception]
+fn SysTick() {
+    unsafe {
+        // here we may observe `X` having the value `0x0000_0000_0000_0000`
+        // or `0xffff_ffff_ffff_ffff` which are not valid `Enum` variants
+        match X {
+            Enum::A =&gt; asm::nop(),
+            Enum::B =&gt; asm::bkpt(),
+        }
+    }
+}
+</code></pre></pre>
+<p>In this program the interrupt handler could preempt the 2-step write operation
+that changes <code>X</code> from variant <code>A</code> to variant <code>B</code> (or vice versa) mid way. If
+that happens the handler could observe <code>X</code> having the value
+<code>0x0000_0000_0000_0000</code> or <code>0xffff_ffff_ffff_ffff</code>, neither of which are valid
+values for the enum.</p>
+<p>Let me say that again: <em>Relying only on volatile operations for memory safety
+is likely wrong</em>. The only semantics that volatile operations provide are:
+&quot;tell the compiler to not remove this operation, or merge it with another
+operation&quot; and &quot;tell the compiler to not reorder this operation with respect to
+other <em>volatile</em> operations&quot;; neither is directly related to synchronized
+access to memory.</p>
+<a class="header" href="#atomics" id="atomics"><h3>Atomics</h3></a>
+<p>Accessing atomics stored in <code>static</code> variables is memory safe. If you are
+building abstractions like channels on top of them (which likely will require
+<code>unsafe</code> code to access some shared buffer) make sure you use the right
+<code>Ordering</code> or your abstraction will be unsound.</p>
+<p>Here's an example of using a static variable for synchronization (a delay in
+this case).</p>
+<blockquote>
+<p><strong>NOTE:</strong> not all embedded targets have atomic CAS instructions in their ISA.
+MSP430 and ARMv6-M are prime examples. API like <code>AtomicUsize.fetch_add</code> is not
+available in <code>core</code> for those targets.</p>
+</blockquote>
+<pre><pre class="playpen"><code class="language-rust">static X: AtomicBool = AtomicBool::new(false);
+
+#[entry]
+fn main() -&gt; ! {
+    // omitted: configuring and enabling the `SysTick` interrupt
+
+    // wait until `SysTick` returns before starting the main logic
+    while !X.load(Ordering::Relaxed) {}
+
+    loop {
+        // main logic
+    }
+}
+
+#[exception]
+fn SysTick() {
+    X.store(true, Ordering::Relaxed);
+}
+</code></pre></pre>
+<a class="header" href="#state-and-re-entrancy" id="state-and-re-entrancy"><h3>State and re-entrancy</h3></a>
+<p>A common pattern in embedded C is to use a <code>static</code> variable to preserve state
+between invocations of an interrupt handler.</p>
+<pre><code class="language-c">void handler() {
+    static int counter = 0;
+
+    counter += 1;
+
+    // ..
+}
+</code></pre>
+<p>This makes the function non-reentrant, meaning that calling this function from
+itself, from <code>main</code> or an interrupt handler is UB (it breaks mutable aliasing
+rules).</p>
+<p>We can make this C pattern safe in Rust if we make the non-reentrant function
+<code>unsafe</code> to call or impossible to call. <code>cortex-m-rt</code> v0.5.x supports this
+pattern and uses the latter approach to prevent calling non-reentrant functions
+from safe code.</p>
+<p>Consider this example:</p>
+<pre><pre class="playpen"><code class="language-rust">// source: examples/state.rs
+
+#![no_main]
+#![no_std]
+
+extern crate panic_halt;
+
+use cortex_m::asm;
+use cortex_m_rt::{entry, exception};
+
+#[inline(never)]
+#[entry]
+fn main() -&gt; ! {
+    loop {
+        // SysTick(); //~ ERROR: cannot find function `SysTick` in this scope
+
+        asm::nop();
+    }
+}
+
+#[exception]
+fn SysTick() {
+    static mut COUNTER: u64 = 0;
+
+    // user code
+    *COUNTER += 1;
+
+    // SysTick(); //~ ERROR: cannot find function `SysTick` in this scope
+}
+</code></pre></pre>
+<p>The <code>#[exception]</code> attribute performs the following source-level transformation:</p>
+<pre><pre class="playpen"><code class="language-rust">
+# #![allow(unused_variables)]
+#fn main() {
+#[link_name = &quot;SysTick&quot;] // places this function in the vector table
+fn randomly_generated_identifier() {
+    let COUNTER: &amp;mut u64 = unsafe {
+        static mut COUNTER: u64 = 0;
+
+        &amp;mut COUNTER
+    };
+
+    // user code
+    *COUNTER += 1;
+
+    // ..
+}
+#}</code></pre></pre>
+<p>Placing the <code>static mut</code> variable inside a block makes it impossible to create
+more references to it from user code.</p>
+<p>This transformation ensures that the software can't call the interrupt handler
+from safe code, but could the hardware invoke the interrupt handler in a way
+that breaks memory safety? The answer is: <em>it depends</em>, on the target
+architecture.</p>
+<p>In the ARM Cortex-M architecture once an instance of an interrupt handler starts
+another one won't start until the first one ends (if the same interrupt signal
+arrives again it is withheld). On the other hand, in the ARM Cortex-R
+architecture there's a single handler for all interrupts; receiving two
+different interrupt signals can cause the handler (function) to be invoked twice
+and that would break the memory safety of the source level transformation we
+presented above.</p>
+<a class="header" href="#critical-sections" id="critical-sections"><h3>Critical sections</h3></a>
+<p>When it's necessary to share state between <code>main</code> and an interrupt handler a
+critical section can be used to synchronize access. The simplest critical
+section implementation consists of temporarily disabling <em>all</em> interrupts while
+<code>main</code> accesses the shared <code>static</code> variable. Example below:</p>
+<pre><pre class="playpen"><code class="language-rust">// source: examples/cs1.rs
+
+#![no_main]
+#![no_std]
+
+extern crate panic_halt;
+
+use cortex_m::interrupt;
+use cortex_m_rt::{entry, exception};
+
+static mut COUNTER: u64 = 0;
+
+#[inline(never)]
+#[entry]
+fn main() -&gt; ! {
+    loop {
+        // `SysTick` can preempt `main` at this point
+
+        // start of critical section: disable interrupts
+        interrupt::disable(); // = `asm!(&quot;CPSID I&quot; : : : &quot;memory&quot; : &quot;volatile&quot;)`
+                              //                         ^^^^^^^^
+
+        // `SysTick` can not preempt this block
+        {
+            let counter: &amp;mut u64 = unsafe { &amp;mut COUNTER };
+
+            *counter += 1;
+        }
+
+        // end of critical section: re-enable interrupts
+        unsafe { interrupt::enable() }
+        //^= `asm!(&quot;CPSIE I&quot; : : : &quot;memory&quot; : &quot;volatile&quot;)`
+        //                         ^^^^^^^^
+
+        // `SysTick` can start at this point
+    }
+}
+
+#[exception]
+fn SysTick() {
+    // exclusive access to `COUNTER`
+    let counter: &amp;mut u64 = unsafe { &amp;mut COUNTER };
+
+    *counter += 1;
+}
+</code></pre></pre>
+<p>Note the use of the <code>&quot;memory&quot;</code> clobber; this acts as a compiler barrier that
+prevents the compiler from reordering the operation on <code>COUNTER</code> to outside the
+critical section. It's also important to <em>not</em> access <code>COUNTER</code> in <code>main</code>
+outside a critical section; thus references to <code>COUNTER</code> should not escape the
+critical section. With these two restrictions in place, the mutable reference to
+<code>COUNTER</code> created in <code>SysTick</code> is guaranteed to be unique for the whole
+execution of the handler.</p>
+<p>Disabling all the interrupt is not the only way to create a critical section;
+other ways include masking interrupts (disabling one or a subset of all
+interrupts) and increasing the running priority (see next section).</p>
+<p>Masking interrupts to create a critical section deserves an example because it
+doesn't use inline <code>asm!</code> and thus requires explicit compiler barriers
+(<code>atomic::compiler_fence</code>) for memory safety.</p>
+<pre><pre class="playpen"><code class="language-rust">// source: examples/cs2.rs
+
+#![no_main]
+#![no_std]
+
+extern crate panic_halt;
+
+use core::sync::atomic::{self, Ordering};
+
+use cortex_m_rt::{entry, exception};
+
+static mut COUNTER: u64 = 0;
+
+#[inline(never)]
+#[entry]
+fn main() -&gt; ! {
+    let mut syst = cortex_m::Peripherals::take().unwrap().SYST;
+
+    // omitted: configuring and enabling the `SysTick` interrupt
+
+    loop {
+        // `SysTick` can preempt `main` at this point
+
+        // start of critical section: disable the `SysTick` interrupt
+        syst.disable_interrupt();
+        // ^ this method is implemented as shown in the comment below
+        //
+        // ```
+        // let csr = ptr::read_volatile(0xE000_E010);`
+        // ptr::write_volatile(0xE000_E010, csr &amp; !(1 &lt;&lt; 1));
+        // ```
+
+        // a compiler barrier equivalent to the &quot;memory&quot; clobber
+        atomic::compiler_fence(Ordering::SeqCst);
+
+        // `SysTick` can not preempt this block
+        {
+            let counter: &amp;mut u64 = unsafe { &amp;mut COUNTER };
+
+            *counter += 1;
+        }
+
+        atomic::compiler_fence(Ordering::SeqCst);
+
+        // end of critical section: re-enable the `SysTick` interrupt
+        syst.enable_interrupt();
+        // ^ this method is implemented as shown in the comment below
+        //
+        // ```
+        // let csr = ptr::read_volatile(0xE000_E010);`
+        // ptr::write_volatile(0xE000_E010, csr | (1 &lt;&lt; 1));
+        // ```
+
+        // `SysTick` can start at this point
+    }
+}
+
+#[exception]
+fn SysTick() {
+    // exclusive access to `COUNTER`
+    let counter: &amp;mut u64 = unsafe { &amp;mut COUNTER };
+
+    *counter += 1;
+}
+</code></pre></pre>
+<p>The code is very similar to the one that disabled all interrupts except for the
+start and end of the critical section, which now include a <code>compiler_fence</code>
+(compiler barrier).</p>
+<a class="header" href="#priorities" id="priorities"><h3>Priorities</h3></a>
+<p>Architectures like ARM Cortex-M allow interrupt prioritization, meaning that an
+interrupt that's given high priority can preempt a lower priority interrupt
+handler. Priorities must be considered when sharing state between interrupt
+handlers.</p>
+<p>When two interrupt handlers, say <code>A</code> and <code>B</code>, have the <em>same</em> priority no
+preemption can occur. Meaning that when signals for both interrupts arrive
+around the same time then the handlers will be executed sequentially: that is
+first <code>A</code> and then <code>B</code>, or vice versa. In this scenario, both handlers can
+access the same <code>static mut</code> variable <em>without</em> using a critical section; each
+handler will &quot;take turns&quot; at getting exclusive access (<code>&amp;mut-</code>) to the static
+variable. Example below.</p>
+<pre><pre class="playpen"><code class="language-rust">// source: examples/coop.rs
+
+#![no_main]
+#![no_std]
+
+extern crate panic_halt;
+
+use cortex_m::asm;
+use cortex_m_rt::{entry, exception};
+
+// priority = 0 (lowest)
+#[inline(never)]
+#[entry]
+fn main() -&gt; ! {
+    // omitted: enabling interrupts and setting their priorities
+
+    loop {
+        asm::nop();
+    }
+}
+
+static mut COUNTER: u64 = 0;
+
+// priority = 1
+#[exception]
+fn SysTick() {
+    // exclusive access to `COUNTER`
+    let counter: &amp;mut u64 = unsafe { &amp;mut COUNTER };
+
+    *counter += 1;
+}
+
+// priority = 1
+#[exception]
+fn SVCall() {
+    // exclusive access to `COUNTER`
+    let counter: &amp;mut u64 = unsafe { &amp;mut COUNTER };
+
+    *counter *= 2;
+}
+</code></pre></pre>
+<p>When two interrupt handlers have <em>different</em> priorities then one can preempt
+the other. Safely sharing state between these two interrupts requires a critical
+section in the lower priority handler -- just like in the case of <code>main</code> and an
+interrupt handler. However, one more constraint is required: the priority of the
+interrupts must remain fixed at runtime; reversing the priorities at runtime,
+for example, would result in a data race.</p>
+<p>The following example showcases safe state sharing between two interrupt
+handlers using a priority-based critical section.</p>
+<pre><pre class="playpen"><code class="language-rust">// source: examples/cs3.rs
+
+#![no_main]
+#![no_std]
+
+extern crate panic_halt;
+
+use cortex_m::{asm, register::basepri};
+use cortex_m_rt::{entry, exception};
+
+// priority = 0 (lowest)
+#[inline(never)]
+#[entry]
+fn main() -&gt; ! {
+    // omitted: enabling interrupts and setting up their priorities
+
+    loop {
+        asm::nop();
+    }
+}
+
+static mut COUNTER: u64 = 0;
+
+// priority = 2
+#[exception]
+fn SysTick() {
+    // exclusive access to `COUNTER`
+    let counter: &amp;mut u64 = unsafe { &amp;mut COUNTER };
+
+    *counter += 1;
+}
+
+// priority = 1
+#[exception]
+fn SVCall() {
+    // `SysTick` can preempt `SVCall` at this point
+
+    // start of critical section: raise the running priority to 2
+    raise(2);
+
+    // `SysTick` can *not* preempt this block because it has a priority of 2 (equal)
+    // `PendSV` *can* preempt this block because it has a priority of 3 (higher)
+    {
+        // exclusive access to `COUNTER`
+        let counter: &amp;mut u64 = unsafe { &amp;mut COUNTER };
+
+        *counter *= 2;
+    }
+
+    // start of critical section: lower the running priority to its original value
+    unsafe { lower() }
+
+    // `SysTick` can preempt `SVCall` again
+}
+
+// priority = 3
+#[exception]
+fn PendSV() {
+    // .. does not access `COUNTER` ..
+}
+
+fn raise(priority: u8) {
+    const PRIO_BITS: u8 = 3;
+
+    // (priority is encoded in hardware in the higher order bits of a byte)
+    // (also in this encoding a bigger number means lower priority)
+    let p = ((1 &lt;&lt; PRIO_BITS) - priority) &lt;&lt; (8 - PRIO_BITS);
+
+    unsafe { basepri::write(p) }
+    //^= `asm!(&quot;MSR BASEPRI, $0&quot; : &quot;=r&quot;(p) : : &quot;memory&quot; : &quot;volatile&quot;)`
+    //                                         ^^^^^^^^
+}
+
+unsafe fn lower() {
+    basepri::write(0)
+}
+</code></pre></pre>
+<a class="header" href="#runtime-initialization" id="runtime-initialization"><h3>Runtime initialization</h3></a>
+<p>A common need in embedded Rust programs is moving, at runtime, a value from
+<code>main</code> into an interrupt handler. This can be accomplished at zero cost by
+enforcing sequential access to <code>static mut</code> variables.</p>
+<pre><pre class="playpen"><code class="language-rust">// source: examples/init.rs
+
+#![feature(maybe_uninit)]
+#![no_main]
+#![no_std]
+
+extern crate panic_halt;
+
+use core::mem::MaybeUninit;
+
+use cortex_m::{asm, interrupt};
+use cortex_m_rt::{entry, exception};
+
+struct Thing {
+    _state: (),
+}
+
+impl Thing {
+    // NOTE the constructor is not `const`
+    fn new() -&gt; Self {
+        Thing { _state: () }
+    }
+
+    fn do_stuff(&amp;mut self) {
+        // ..
+    }
+}
+
+// uninitialized static variable
+static mut THING: MaybeUninit&lt;Thing&gt; = MaybeUninit::uninitialized();
+
+#[entry]
+fn main() -&gt; ! {
+    // # Initialization phase
+
+    // done as soon as the device boots
+    interrupt::disable();
+
+    // critical section that can't be preempted by any interrupt
+    {
+        // initialize the static variable at runtime
+        unsafe { THING.set(Thing::new()) };
+
+        // omitted: configuring and enabling the `SysTick` interrupt
+    }
+
+    // reminder: this is a compiler barrier
+    unsafe { interrupt::enable() }
+
+    // # main loop
+
+    // `SysTick` can preempt `main` at this point
+
+    loop {
+        asm::nop();
+    }
+}
+
+#[exception]
+fn SysTick() {
+    // this handler always observes the variable as initialized
+    let thing: &amp;mut Thing = unsafe { &amp;mut *THING.as_mut_ptr() };
+
+    thing.do_stuff();
+}
+</code></pre></pre>
+<p>In this pattern is important to disable interrupts before yielding control to
+the user program and enforcing that the end user initializes all the
+uninitialized static variables before interrupts are re-enabled. Failure to do
+so would result in interrupt handlers observing uninitialized static variables.</p>
+<a class="header" href="#redefining-send-and-sync" id="redefining-send-and-sync"><h2>Redefining <code>Send</code> and <code>Sync</code></h2></a>
+<p>The core / standard library defines these two marker traits as:</p>
+<blockquote>
+<p><code>Sync</code>: types for which it is safe to share references between threads.</p>
+<p><code>Send</code>: types that can be transferred across thread boundaries</p>
+</blockquote>
+<p>Threads are an OS abstraction so they don't exist &quot;out of the box&quot; in bare metal
+context, though they can be implemented on top of interrupts. We'll broaden the
+definition of these two marker traits to include bare metal code:</p>
+<ul>
+<li>
+<p><code>Sync</code>: types for which it is safe to share references between <em>execution
+contexts</em>.</p>
+</li>
+<li>
+<p><code>Send</code>: types that can be transferred between <em>execution contexts</em>.</p>
+</li>
+</ul>
+<p>An interrupt handler is an execution context independent of the <code>main</code> function,
+which can be seen as the &quot;bottom&quot; execution context. An OS thread is also an
+execution context. Each execution context has its own (call) stack and operates
+independently of other execution contexts though they can share state.</p>
+<p>Broadening the definitions of these marker traits does not change the rules
+around <code>static</code> variables. They must still hold values that implement the <code>Sync</code>
+trait. Atomics implement <code>Sync</code> so they are valid to place in <code>static</code> variables
+in bare metal context.</p>
+<p>Let's now revisit the safe patterns we described before and see where the <code>Sync</code>
+and <code>Send</code> bounds need to be enforced for safety.</p>
+<a class="header" href="#state" id="state"><h3>State</h3></a>
+<pre><pre class="playpen"><code class="language-rust">
+# #![allow(unused_variables)]
+#fn main() {
+#[exception]
+fn SysTick() {
+    static mut X: Type = Type::new();
+}
+#}</code></pre></pre>
+<p>Does <code>Type</code> need to satisfy <code>Sync</code> or <code>Send</code>? <code>X</code> is effectively owned by the
+<code>SysTick</code> interrupt and not shared with any other execution context so neither
+bound is required for this pattern.</p>
+<a class="header" href="#critical-section" id="critical-section"><h3>Critical section</h3></a>
+<p>We can abstract the &quot;disable all interrupts&quot; critical section pattern into a
+<code>Mutex</code> type.</p>
+<pre><pre class="playpen"><code class="language-rust">// source: examples/mutex.rs
+
+#![no_main]
+#![no_std]
+
+extern crate panic_halt;
+
+use core::cell::{RefCell, UnsafeCell};
+
+use bare_metal::CriticalSection;
+use cortex_m::interrupt;
+use cortex_m_rt::{entry, exception};
+
+struct Mutex&lt;T&gt;(UnsafeCell&lt;T&gt;);
+
+// TODO does T require a Sync / Send bound?
+unsafe impl&lt;T&gt; Sync for Mutex&lt;T&gt; {}
+
+impl&lt;T&gt; Mutex&lt;T&gt; {
+    const fn new(value: T) -&gt; Mutex&lt;T&gt; {
+        Mutex(UnsafeCell::new(value))
+    }
+
+    // NOTE: the `'cs` constraint prevents the returned reference from outliving
+    // the `CriticalSection` token
+    fn borrow&lt;'cs&gt;(&amp;self, _cs: &amp;'cs CriticalSection) -&gt; &amp;'cs T {
+        unsafe { &amp;*self.0.get() }
+    }
+}
+
+static COUNTER: Mutex&lt;RefCell&lt;u64&gt;&gt; = Mutex::new(RefCell::new(0));
+
+#[inline(never)]
+#[entry]
+fn main() -&gt; ! {
+    loop {
+        // `interrupt::free` runs the closure in a critical section (interrupts disabled)
+        interrupt::free(|cs: &amp;CriticalSection| {
+            let counter: &amp;RefCell&lt;u64&gt; = COUNTER.borrow(cs);
+
+            *counter.borrow_mut() += 1;
+
+            // &amp;*counter.borrow() //~ ERROR: this reference cannot outlive the closure
+        });
+    }
+}
+
+#[exception]
+fn SysTick() {
+    interrupt::free(|cs| {
+        let counter = COUNTER.borrow(cs);
+        *counter.borrow_mut() *= 2;
+    });
+}
+</code></pre></pre>
+<p>Here we use a <code>CriticalSection</code> token to prevent references escaping the
+critical section / closure (see the lifetime constraints in <code>Mutex.borrow</code>).</p>
+<p>It's important to note that a <code>Mutex.borrow_mut</code> method with no additional
+runtime checks would be unsound as it would let the end user break Rust aliasing
+rules:</p>
+<pre><pre class="playpen"><code class="language-rust">
+# #![allow(unused_variables)]
+#fn main() {
+#[exception]
+fn SysTick() {
+    interrupt::free(|cs| {
+        // both `counter` and `alias` refer to the same memory location
+        let counter: &amp;mut u64 = COUNTER.borrow_mut(cs);
+        let alias: &amp;mut u64 = COUNTER.borrow_mut(cs);
+    });
+}
+#}</code></pre></pre>
+<p>Changing the signature of <code>borrow_mut</code> to <code>fn&lt;'cs&gt;(&amp;self, &amp;'cs mut CriticalSection) -&gt; &amp;'cs mut T</code> does <em>not</em> help because it's possible to nest
+calls to <code>interrupt::free</code>.</p>
+<pre><pre class="playpen"><code class="language-rust">
+# #![allow(unused_variables)]
+#fn main() {
+#[exception]
+fn SysTick() {
+    interrupt::free(|cs: &amp;mut CriticalSection| {
+        let counter: &amp;mut u64 = COUNTER.borrow_mut(cs);
+
+        // let alias: &amp;mut u64 = COUNTER.borrow_mut(cs);
+        //~^ ERROR: `cs` already mutably borrowed
+
+        interrupt::free(|cs2: &amp;mut CriticalSection| {
+            // this breaks aliasing rules
+            let alias: &amp;mut u64 = COUNTER.borrow_mut(cs2);
+        });
+    });
+}
+#}</code></pre></pre>
+<p>As for the bounds required on the value of type <code>T</code> protected by the <code>Mutex</code>:
+<code>T</code> must implement the <code>Send</code> trait because a <code>Mutex</code> can be used as a channel
+to move values from <code>main</code> to an interrupt handler. See below:</p>
+<pre><pre class="playpen"><code class="language-rust">struct Thing {
+    _state: (),
+}
+
+static CHANNEL: Mutex&lt;RefCell&lt;Option&lt;Thing&gt;&gt;&gt; = Mutex::new(RefCell::new(None));
+
+#[entry]
+fn main() -&gt; ! {
+    interrupt::free(|cs| {
+        let channel = CHANNEL.borrow(cs);
+
+        *channel.borrow_mut() = Some(Thing::new());
+    });
+
+    loop {
+        asm::nop();
+    }
+}
+
+#[exception]
+fn SysTick() {
+    interrupt::free(|cs| {
+        let channel = CHANNEL.borrow(cs);
+        let maybe_thing = channel.borrow_mut().take();
+        if let Some(thing) = mabye_thing {
+            // `thing` has been moved into the interrupt handler
+        }
+    });
+}
+</code></pre></pre>
+<p>So the <code>Sync</code> implementation must look like this:</p>
+<pre><pre class="playpen"><code class="language-rust">
+# #![allow(unused_variables)]
+#fn main() {
+unsafe impl&lt;T&gt; Sync for Mutex&lt;T&gt; where T: Send {}
+#}</code></pre></pre>
+<p>This constraint applies to all types of critical sections.</p>
+<a class="header" href="#runtime-initialization-1" id="runtime-initialization-1"><h3>Runtime initialization</h3></a>
+<p>For the pattern of moving values from <code>main</code> to an interrupt handler this is
+clearly a &quot;send&quot; operation so the moved value must implement the <code>Send</code> trait.
+We won't give an example of an abstraction for that pattern in this text but any
+such abstraction must enforce at compile time that values to be moved implement
+the <code>Send</code> trait.</p>
+<a class="header" href="#multi-core" id="multi-core"><h2>Multi-core</h2></a>
+<p>So far we have discussed single core devices. Let's see how having multiple
+cores affects the memory safety of the abstractions and patterns we have
+covered.</p>
+<a class="header" href="#mutex-sync" id="mutex-sync"><h3><code>Mutex: !Sync</code></h3></a>
+<p>The <code>Mutex</code> abstraction we created and that disables interrupts to create a
+critical section is unsound in multi-core context. The reason is that the
+critical section doesn't prevent <em>other</em> cores from making progress so if more
+than one core gets a reference to the data behind the <code>Mutex</code> all accesses
+become data races.</p>
+<p>Here an example where we assume a dual-core device and a framework that lets you
+write bare-metal multi-core in a single source file.</p>
+<pre><pre class="playpen"><code class="language-rust">// THIS PROGRAM IS UNSOUND!
+
+// single memory location visible to both cores
+static COUNTER: Mutex&lt;Cell&lt;u64&gt;&gt; = Mutex::new(Cell::new(0));
+
+// runs on the first core
+#[core(0)]
+#[entry]
+fn main() -&gt; ! {
+    loop {
+        interrupt::free(|cs| {
+            let counter = COUNTER.borrow(cs);
+
+            counter.set(counter.get() + 1);
+        });
+    }
+}
+
+// runs on the second core
+#[core(1)]
+#[entry]
+fn main() -&gt; ! {
+    loop {
+        interrupt::free(|cs| {
+            let counter = COUNTER.borrow(cs);
+
+            counter.set(counter.get() * 2);
+        });
+    }
+}
+</code></pre></pre>
+<p>Here each core accesses the <code>COUNTER</code> variable in their <code>main</code> context in an
+unsynchronized manner; this is undefined behavior.</p>
+<p>The problem with <code>Mutex</code> is not the critical section that uses; it's the fact
+that it can be stored in a <code>static</code> variable making accessible to all cores.
+Thus in multi-core context the <code>Mutex</code> abstraction should not implement the
+<code>Sync</code> trait.</p>
+<p>Critical sections based on interrupt masking <em>can</em> be used safely on
+architectures / devices where it's possible to assign a <em>single</em> core to an
+interrupt and any core can mask that interrupt, provided that scoping is
+enforced somehow. Here's an example:</p>
+<pre><pre class="playpen"><code class="language-rust">
+# #![allow(unused_variables)]
+#fn main() {
+static mut COUNTER: u64 = 0;
+
+// runs on the first core
+// priority = 2
+#[core(0)]
+#[exception]
+fn SysTick() {
+    // exclusive access to `COUNTER`
+    let counter: &amp;mut u64 = unsafe { &amp;mut COUNTER };
+
+    *counte += 1;
+}
+
+// initialized in the second core's `main` function using the runtime
+// initialization pattern
+static mut SYST: MaybeUninit&lt;SYST&gt; = MaybeUninit::ununitialized();
+
+// runs on the second core
+// priority = 1
+#[core(1)]
+#[exception]
+fn SVCall() {
+    // `SYST` is owned by this core / interrupt
+    let syst = unsafe { &amp;mut *SYST.as_mut_ptr() };
+
+    // start of critical section: disable the `SysTick` interrupt
+    syst.disable_interrupt();
+
+    atomic::compiler_fence(Ordering::SeqCst);
+
+    // `SysTick` can not preempt this block
+    {
+        let counter: &amp;mut u64 = unsafe { &amp;mut COUNTER };
+
+        *counter += 1;
+    }
+
+    atomic::compiler_fence(Ordering::SeqCst);
+
+    // end of critical section: re-enable the `SysTick` interrupt
+    syst.enable_interrupt();
+}
+#}</code></pre></pre>
+<a class="header" href="#atomics-1" id="atomics-1"><h3>Atomics</h3></a>
+<p>Atomics are safe to use in multi-core context provided that memory barrier
+instructions are inserted where appropriate. If you are using the correct
+<code>Ordering</code> then the compiler will insert the required barriers for you. Critical
+sections based on atomics, AKA spinlocks, are memory safe to use on multi-core
+devices though they can deadlock.</p>
+<pre><pre class="playpen"><code class="language-rust">// spin = &quot;0.5.0&quot;
+use spin::Mutex;
+
+static COUNTER: Mutex&lt;u64&gt; = Mutex::new(0);
+
+// runs on the first core
+#[core(0)]
+#[entry]
+fn main() -&gt; ! {
+    loop {
+        *COUNTER.lock() += 1;
+    }
+}
+
+// runs on the second core
+#[core(1)]
+#[entry]
+fn main() -&gt; ! {
+    loop {
+        *COUNTER.lock() *= 2;
+    }
+}
+</code></pre></pre>
+<a class="header" href="#state-1" id="state-1"><h3>State</h3></a>
+<p>The stateful interrupt handler pattern remains safe if and only if the target
+architecture / device supports assigning a handler to a single core and the
+program has been configured to not share stateful interrupts between cores --
+that is cores should <em>not</em> execute the exact same handler when the corresponding
+signal arrives.</p>
+<a class="header" href="#runtime-initialization-2" id="runtime-initialization-2"><h3>Runtime initialization</h3></a>
+<p>As the runtime initialization pattern is used to initialize the &quot;state&quot; of
+interrupt handlers so all the additional constraints required for multi-core
+memory safety of the State pattern are also required here.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                        
+                            <a rel="prev" href="dma.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        
+
+                        
+                            <a rel="next" href="compiler-support.html" class="mobile-nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                                <i class="fa fa-angle-right"></i>
+                            </a>
+                        
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                
+                    <a href="dma.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+                
+
+                
+                    <a href="compiler-support.html" class="nav-chapters next" title="Next chapter" aria-label="Next chapter" aria-keyshortcuts="Right">
+                        <i class="fa fa-angle-right"></i>
+                    </a>
+                
+            </nav>
+
+        </div>
+
+        
+
+        
+
+        
+
+        
+        <script src="elasticlunr.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="mark.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="searcher.js" type="text/javascript" charset="utf-8"></script>
+        
+
+        <script src="clipboard.min.js" type="text/javascript" charset="utf-8"></script>
+        <script src="highlight.js" type="text/javascript" charset="utf-8"></script>
+        <script src="book.js" type="text/javascript" charset="utf-8"></script>
+
+        <!-- Custom JS scripts -->
+        
+
+        
+
+    </body>
+</html>
